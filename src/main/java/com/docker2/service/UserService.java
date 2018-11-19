@@ -20,11 +20,12 @@ public class UserService {
     private UserMapper userMapper;
 
     public User login(HttpServletRequest request) {
-        String ip = request.getRemoteAddr();
-        User user = userMapper.findOneByIp(ip);
+        String ip = request.getRemoteAddr();        //代理ip
+        String rIp = request.getHeader("X-Real-IP");        //真实ip
+        User user = userMapper.findOneByIp(ip + " / " + rIp);
         if (user == null) {
             String id = UUID.randomUUID().toString();
-            if (userMapper.insert(new User(id, ip, 1)) == 1) {
+            if (userMapper.insert(new User(id, ip + " / " + rIp, 1)) == 1) {
                 return userMapper.selectByPrimaryKey(id);
             } else {
                 return null;
